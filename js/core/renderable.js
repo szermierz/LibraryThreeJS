@@ -23,3 +23,8 @@ Renderable = function(Material, Geometry)
 		return new THREE.Mesh(this.m_geometry, this.m_material);
 	}
 }
+
+Library = function(BlockPosX, BlockPosY)
+{
+	
+}

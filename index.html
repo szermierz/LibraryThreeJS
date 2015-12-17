@@ -58,9 +58,36 @@
 			console.log("Initialized display!");
 			
 			// Load resources:
+			//todo jakies tekstury
+			console.log("Started loading resources!");
 			
 			
-			console.log("Loaded resources!");
+			var OnLoaded = function()
+			{
+				//todo
+				
+				console.log("Loaded resources!");
+			}
+			
+			var renderLoop = function () 
+			{
+				if(g_IsLoading == true && g_ObjectToLoad <= 0)
+				{
+					g_IsLoading = false;
+
+					OnLoaded();
+				}
+
+				requestAnimationFrame(renderLoop);
+				
+				if(g_IsLoading)
+					g_Renderer.render(g_LoadingScene, g_MainCamera);
+				else
+					g_Renderer.render(g_MainScene, g_MainCamera);
+			};
+
+			renderLoop();
+			
 			
 		</script>
 		
