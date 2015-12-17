@@ -31,9 +31,10 @@ ResourceLoader = function()
 	
 	this.LoadTexture = function(TextureFileName, Callback)
 	{
-		var texture;
-		//todo
-		Callback(texture);
+		var fileTexture = new THREE.ImageUtils.loadTexture(TextureFileName, {}, function()
+		{
+			Callback(fileTexture);
+		} );
 	}
 }
 
