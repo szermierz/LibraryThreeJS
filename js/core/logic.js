@@ -142,3 +142,4 @@ var ExecuteOrders = function()
 		g_HumanPosZ=g_MainCamera.position.z;
 	}
 }
+

@@ -9,6 +9,13 @@
 	<body>
 		<canvas id="renderCanvas"></canvas>
 
+		<!-- Utils -->
+		<script src="js/utils/sha1.js"></script>
+		
+		<!-- Socket.io -->
+		<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+		<script src="js/core/socketevents.js"></script>
+		
 		<!-- PdfJs -->
 		<script src="pdf.js"></script>
 		
@@ -31,7 +38,7 @@
 			
 			// Setup PdfJs
 			'use strict';
-			
+
 			// Setup library variables
 			var c_HumanHeight = 1.0;
 			var g_HumanPosX = 0.0;
@@ -67,6 +74,18 @@
 			document.body.appendChild(g_Renderer.domElement);
 			
 			console.log("Set up main document");
+					
+			// Setup Socket.io
+			var g_SocketDestAddress = '//localhost:8080';
+			var g_Socket = new io.connect(g_SocketDestAddress);
+			var g_SocketConnected = false;
+			//++g_ObjectToLoad;
+			g_Socket.connect();
+			g_Socket.on('connect', OnSocketConnect);
+			g_Socket.on('message', OnSocketMessageArrived);
+			g_Socket.on('disconnect', OnSocketDisconnect);
+			
+			console.log("Set up Socket.io");
 			
 			// Connect event listeners
 			var g_OrderRotateLeft   = false;
