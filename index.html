@@ -18,8 +18,18 @@
 		<!-- Renderable -->
 		<script src="js/objects/renderable.js"></script>
 		
+		<!-- Events -->
+		<script src="js/core/events.js"></script>
+		
 		<script>
 			
+			// Setup library variables
+			var g_HumanHeight = 1.0;
+			var g_HumanPosX = 0.0;
+			var g_HumanPosY = 0.0;
+			var g_HumanPosZ = g_HumanHeight;
+			
+			// Setup globals
 			var g_ScreenWidth = window.innerWidth;
 			var g_ScreenHeight = window.innerHeight;
 			var g_MainScene = new THREE.Scene();
@@ -61,14 +71,6 @@
 			//todo jakies tekstury
 			console.log("Started loading resources!");
 			
-			
-			var OnLoaded = function()
-			{
-				//todo
-				
-				console.log("Loaded resources!");
-			}
-			
 			var renderLoop = function () 
 			{
 				if(g_IsLoading == true && g_ObjectToLoad <= 0)
@@ -79,6 +81,8 @@
 				}
 
 				requestAnimationFrame(renderLoop);
+			
+				OnUpdate();
 				
 				if(g_IsLoading)
 					g_Renderer.render(g_LoadingScene, g_MainCamera);
