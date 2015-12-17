@@ -21,11 +21,11 @@
 		<!-- Renderable -->
 		<script src="js/core/renderable.js"></script>
 		
-		<!-- Events -->
-		<script src="js/core/events.js"></script>
-		
 		<!-- Logic -->
 		<script src="js/core/logic.js"></script>
+		
+		<!-- Events -->
+		<script src="js/core/events.js"></script>
 		
 		<script>
 			
@@ -33,10 +33,17 @@
 			'use strict';
 			
 			// Setup library variables
-			var g_HumanHeight = 1.0;
+			var c_HumanHeight = 1.0;
 			var g_HumanPosX = 0.0;
 			var g_HumanPosY = 0.0;
-			var g_HumanPosZ = g_HumanHeight;
+			var g_HumanPosZ = c_HumanHeight;
+			var g_HumanDirection = 0.0;
+			
+			// Setup floor variables
+			var c_FloorRefreshDistance = 2.0;
+			var g_FloorTiles = [];
+			var g_FloorRefreshStartPosX;
+			var g_FloorRefreshStartPosY;
 			
 			// Setup globals
 			var g_ScreenWidth = window.innerWidth;
@@ -47,7 +54,7 @@
 			var g_RenderContext = g_RenderCanvas.getContext("3d");
 			var g_MainScene = new THREE.Scene();
 			var g_LoadingScene = new THREE.Scene();
-			var g_MainCamera = new THREE.PerspectiveCamera( 90, window.innerWidth/window.innerHeight, g_ScreenHeight / 4, g_ScreenHeight / 2 );
+			var g_MainCamera = new THREE.PerspectiveCamera(90, g_ScreenWidth/g_ScreenHeight, g_ScreenHeight / 4, g_ScreenHeight / 2);
 			var g_Renderer = new THREE.WebGLRenderer( { canvas: g_RenderCanvas } );
 			var g_IsLoading = true;
 			var g_ObjectToLoad = 0;
@@ -87,17 +94,18 @@
 			console.log("Initialized display!");
 			
 			// Load resources:
-			var l_FloorTexture;
+			var g_FloorTexture;
 			++g_ObjectToLoad;
 			g_Loader.LoadTexture('gfx/floor.png', function(texture)
 			{
-				l_FloorTexture = texture;
+				g_FloorTexture = texture;
 				--g_ObjectToLoad;
 			});
 			
 			console.log("Started loading resources!");
 			
 			//test
+			/*
 			g_Loader.LoadPDFTexture('test.pdf', 1, function(texture) 
 			{
 				var geo = new THREE.PlaneGeometry(100,100);
@@ -107,6 +115,7 @@
 				
 				g_MainScene.add(mesh);
 			});
+			*/
 			//====
 			
 			var renderLoop = function () 
@@ -119,13 +128,16 @@
 				}
 				
 				requestAnimationFrame(renderLoop);
-			
-				OnUpdate();
 				
 				if(g_IsLoading)
+				{
 					g_Renderer.render(g_LoadingScene, g_MainCamera);
+				}
 				else
+				{
+					OnUpdate();
 					g_Renderer.render(g_MainScene, g_MainCamera);
+				}
 			};
 
 			renderLoop();
