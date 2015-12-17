@@ -19,7 +19,7 @@
 		<script src="fonts/helvetiker.js"></script>
 		
 		<!-- Renderable -->
-		<script src="js/objects/renderable.js"></script>
+		<script src="js/core/renderable.js"></script>
 		
 		<!-- Events -->
 		<script src="js/core/events.js"></script>
@@ -87,34 +87,16 @@
 			console.log("Started loading resources!");
 			
 			//test
-			PDFJS.getDocument('test.pdf').then(function(pdf) {
-				pdf.getPage(1).then(function(page) {
-					var scale = 1.5;
-					var viewport = page.getViewport(scale);
-					
-					var canvas = document.createElement( 'canvas' );
-					var context = canvas.getContext('2d');
-					canvas.height = viewport.height;
-					canvas.width = viewport.width;
-
-					var renderContext = {
-					  canvasContext: context,
-					  viewport: viewport
-					};
-					
-					page.render(renderContext).then(function()
-					{
-							var textu = new THREE.Texture(canvas)
-							textu.needsUpdate = true;
-							
-							var geo = new THREE.PlaneGeometry(100,100);
-							var mat = new THREE.MeshBasicMaterial( {map: textu} );
-							
-							var mesh = new THREE.Mesh(geo, mat);
-							
-							g_MainScene.add(mesh);
-					});
-				});
+			var loader = new PDFLoader();
+			
+			loader.LoadPDFTexture('test.pdf', 1, function(texture) 
+			{
+				var geo = new THREE.PlaneGeometry(100,100);
+				var mat = new THREE.MeshBasicMaterial( {map: texture} );
+				
+				var mesh = new THREE.Mesh(geo, mat);
+				
+				g_MainScene.add(mesh);
 			});
 			//====
 			

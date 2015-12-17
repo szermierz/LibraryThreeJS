@@ -1,30 +1,32 @@
-Renderable = function(Material, Geometry)
-{
-	// Fields
-	this.m_material = Material;
-	this.m_geometry = Geometry;
-	this.m_renderableObject = new THREE.Mesh(this.m_geometry, this.m_material);
-	this.m_isInitialized = true;
-	
-	// Methods
-	this.GetSceneObject = function()
-	{
-		if(!this.m_isInitialized)
-			return null;
-		
-		return this.m_renderableObject;
-	}
-	
-	this.CreateCopySceneObject = function()
-	{
-		if(!this.m_isInitialized)
-			return null;
-		
-		return new THREE.Mesh(this.m_geometry, this.m_material);
-	}
-}
 
-Library = function(BlockPosX, BlockPosY)
+PDFLoader = function()
 {
-	
+	//Methods
+	this.LoadPDFTexture = function(PDFFileName, Page, Callback)
+	{
+		console.log(PDFFileName + ", " + Page );
+		PDFJS.getDocument(PDFFileName).then(function(pdf) 
+		{
+			pdf.getPage(Page).then(function(page) 
+			{
+				var scale = 1.5;
+				var viewport = page.getViewport(scale);
+				
+				var canvas = document.createElement( 'canvas' );
+				var context = canvas.getContext('2d');
+				canvas.height = viewport.height;
+				canvas.width = viewport.width;
+
+				var renderContext = { canvasContext: context, viewport: viewport };
+				
+				page.render(renderContext).then(function()
+				{
+						var texture = new THREE.Texture(canvas)
+						texture.needsUpdate = true;
+						
+						Callback(texture);
+				});
+			});
+		});
+	};
 }
