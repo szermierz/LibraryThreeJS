@@ -34,7 +34,7 @@ ResourceLoader = function()
 		var fileTexture = new THREE.ImageUtils.loadTexture(TextureFileName, {}, function()
 		{
 			Callback(fileTexture);
-		} );
+		});
 	}
 }
 
