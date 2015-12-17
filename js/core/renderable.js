@@ -4,7 +4,6 @@ PDFLoader = function()
 	//Methods
 	this.LoadPDFTexture = function(PDFFileName, Page, Callback)
 	{
-		console.log(PDFFileName + ", " + Page );
 		PDFJS.getDocument(PDFFileName).then(function(pdf) 
 		{
 			pdf.getPage(Page).then(function(page) 
