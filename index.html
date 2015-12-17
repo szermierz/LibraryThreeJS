@@ -18,14 +18,11 @@
 		<script src="js/threejs/FontUtils.js"></script>
 		<script src="fonts/helvetiker.js"></script>
 		
-		<!-- Rendering -->
-		<script src="js/core/rendering.js"></script>
+		<!-- Renderable -->
+		<script src="js/core/renderable.js"></script>
 		
 		<!-- Events -->
 		<script src="js/core/events.js"></script>
-		
-		<!-- Logic -->
-		<script src="js/core/logic.js"></script>
 		
 		<script>
 			
@@ -37,7 +34,6 @@
 			var g_HumanPosX = 0.0;
 			var g_HumanPosY = 0.0;
 			var g_HumanPosZ = g_HumanHeight;
-			var g_HumanDirectionAngle = 0.0;
 			
 			// Setup globals
 			var g_ScreenWidth = window.innerWidth;
@@ -68,7 +64,6 @@
 			console.log("Set up pdf document");
 			
 			// Initialize loading
-			var g_Loader = new PDFLoader();
 			var l_LoadingBorder1 = new THREE.PlaneGeometry(310, 110);
 			var l_LoadingMaterial1 = new THREE.MeshBasicMaterial( { color: 0x999999 } );
 			var l_LoadingBox1 = new THREE.Mesh(l_LoadingBorder1, l_LoadingMaterial1);
@@ -88,18 +83,13 @@
 			console.log("Initialized display!");
 			
 			// Load resources:
-			var l_FloorTexture; ++g_ObjectToLoad;
-			g_Loader.LoadFloorTexture(function(texture) 
-			{
-				l_FloorTexture = texture;
-				
-				--g_ObjectToLoad;
-			});
-			
+			//todo jakies tekstury
 			console.log("Started loading resources!");
 			
 			//test
-			g_Loader.LoadPDFTexture('test.pdf', 1, function(texture) 
+			var loader = new PDFLoader();
+			
+			loader.LoadPDFTexture('test.pdf', 1, function(texture) 
 			{
 				var geo = new THREE.PlaneGeometry(100,100);
 				var mat = new THREE.MeshBasicMaterial( {map: texture} );

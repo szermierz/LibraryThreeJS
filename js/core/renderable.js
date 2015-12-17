@@ -28,17 +28,4 @@ PDFLoader = function()
 			});
 		});
 	};
-	
-	this.LoadFloorTexture = function(Callback)
-	{
-		var texture = THREE.textureUt...;
-		//todo
-		Callback(texture);
-	}
 }
-
-var ReloadScene = function()
-{
-	
-}
-
