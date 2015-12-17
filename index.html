@@ -40,7 +40,7 @@
 			var g_HumanDirection = 0.0;
 			
 			// Setup floor variables
-			var c_FloorRefreshDistance = 2.0;
+			var c_FloorRefreshDistance = 6.5;
 			var g_FloorTiles = [];
 			var g_FloorRefreshStartPosX;
 			var g_FloorRefreshStartPosZ;
@@ -67,6 +67,18 @@
 			document.body.appendChild(g_Renderer.domElement);
 			
 			console.log("Set up main document");
+			
+			// Connect event listeners
+			var g_OrderRotateLeft   = false;
+			var g_OrderRotateRight  = false;
+			var g_OrderMoveForward  = false;
+			var g_OrderMoveBackward = false;
+			var g_OrderMoveToLeft   = false;
+			var g_OrderMoveToRight  = false;
+			document.addEventListener('keyup', OnKeyUp, false);
+			document.addEventListener('keydown', OnKeyDown, false);
+			
+			console.log("Set up event listeners");
 			
 			// Setup pdf document
 			PDFJS.workerSrc = 'pdf.worker.js';

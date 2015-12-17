@@ -11,10 +11,17 @@ var RefreshFloor = function()
 {
 	console.log("Refreshing floor!");
 	
-	var c_FloorTilesX = 5;
-	var c_FloorTilesY = 5;
+	var c_FloorTilesX = 10;
+	var c_FloorTilesY = 10;
 	var c_Geometry = new THREE.PlaneGeometry(1.0, 1.0);
 	var c_Material = new THREE.MeshBasicMaterial( {map: g_FloorTexture} );
+	
+	var i;
+	for(i in g_FloorTiles)
+	{
+		var floorTile = g_FloorTiles[i];
+		g_MainScene.remove(floorTile);
+	}
 	
 	g_FloorRefreshStartPosX = g_HumanPosX;
 	g_FloorRefreshStartPosZ = g_HumanPosZ;
@@ -22,7 +29,7 @@ var RefreshFloor = function()
 	g_FloorTiles = [];
 	
 	var posX = Math.round(g_HumanPosX);
-	var posY = Math.round(g_HumanPosY);
+	var posZ = Math.round(g_HumanPosZ);
 	
 	var x, y;
 	var i = 0;
@@ -31,8 +38,8 @@ var RefreshFloor = function()
 	{
 		g_FloorTiles[i] = new THREE.Mesh(c_Geometry, c_Material);
 		g_FloorTiles[i].rotation.x = Math.PI * 1.5;
-		g_FloorTiles[i].position.x = g_HumanPosX + x - c_FloorTilesX;
-		g_FloorTiles[i].position.z = g_HumanPosZ + y - c_FloorTilesY;
+		g_FloorTiles[i].position.x = posX + x - c_FloorTilesX;
+		g_FloorTiles[i].position.z = posZ + y - c_FloorTilesY;
 		i++;
 	}
 	
@@ -68,28 +75,70 @@ var RefreshCamera = function()
 		g_HumanDirection += 360.0;
 	while(g_HumanDirection > 360.0)
 		g_HumanDirection -= 360.0;
-	
-	//g_MainCamera.rotation.order = 'YXZ';
-	g_MainCamera.rotation.y = g_HumanDirection * Math.PI / 180;
 
-	/*
-	var dir = g_HumanDirection;
-	var raddir = dir * 2.0 * Math.PI / 360.0;
-	if(dir == 0.0)
-		g_MainCamera.lookAt(g_HumanPosX + 1.0, g_HumanPosY, g_HumanPosZ);
-	else if(dir > 0.0 && dir < 90.0)
-		g_MainCamera.lookAt(g_HumanPosX + 1.0, g_HumanPosY + Math.tan(raddir), g_HumanPosZ);
-	else if(dir == 90.0)
-		g_MainCamera.lookAt(g_HumanPosX, g_HumanPosY + 1.0, g_HumanPosZ);
-	else if(dir > 90.0 && dir < 180.0)
-		g_MainCamera.lookAt(g_HumanPosX + 1.0/Math.tan(raddir), g_HumanPosY + 1.0, g_HumanPosZ);
-	else if(dir == 180.0)
-		g_MainCamera.lookAt(g_HumanPosX - 1.0, g_HumanPosY, g_HumanPosZ);
-	else if(dir > 180.0 && dir < 270.0)
-		g_MainCamera.lookAt(g_HumanPosX - 1.0, g_HumanPosY - Math.tan(raddir), g_HumanPosZ);
-	else if(dir == 270.0)
-		g_MainCamera.lookAt(g_HumanPosX, g_HumanPosY - 1.0, g_HumanPosZ);
-	else
-		g_MainCamera.lookAt(g_HumanPosX + 1.0, g_HumanPosY - Math.tan(raddir), g_HumanPosZ);
-	*/
+	g_MainCamera.rotation.y = g_HumanDirection * Math.PI / 180;
+}
+
+var ExecuteOrders = function()
+{
+	var c_MovingSpeed = 0.05;
+	var c_RotatingSpeed = 2.0;
+	
+	if(g_OrderRotateLeft)
+		g_HumanDirection += c_RotatingSpeed;
+	
+	if(g_OrderRotateRight)
+		g_HumanDirection -= c_RotatingSpeed;
+	
+	if(g_OrderMoveForward)
+	{
+		g_MainCamera.position.x = g_HumanPosX;
+		g_MainCamera.position.y = g_HumanPosY;
+		g_MainCamera.position.z = g_HumanPosZ;
+		
+		g_MainCamera.translateZ(-c_MovingSpeed);
+		
+		g_HumanPosX=g_MainCamera.position.x;
+		g_HumanPosY=g_MainCamera.position.y;
+		g_HumanPosZ=g_MainCamera.position.z;
+	}
+	
+	if(g_OrderMoveBackward)
+	{
+		g_MainCamera.position.x = g_HumanPosX;
+		g_MainCamera.position.y = g_HumanPosY;
+		g_MainCamera.position.z = g_HumanPosZ;
+		
+		g_MainCamera.translateZ(c_MovingSpeed);
+		
+		g_HumanPosX=g_MainCamera.position.x;
+		g_HumanPosY=g_MainCamera.position.y;
+		g_HumanPosZ=g_MainCamera.position.z;
+	}
+	
+	if(g_OrderMoveToLeft)
+	{
+		g_MainCamera.position.x = g_HumanPosX;
+		g_MainCamera.position.y = g_HumanPosY;
+		g_MainCamera.position.z = g_HumanPosZ;
+		
+		g_MainCamera.translateX(-c_MovingSpeed);
+		
+		g_HumanPosX=g_MainCamera.position.x;
+		g_HumanPosY=g_MainCamera.position.y;
+		g_HumanPosZ=g_MainCamera.position.z;
+	}
+	
+	if(g_OrderMoveToRight)
+	{
+		g_MainCamera.position.x = g_HumanPosX;
+		g_MainCamera.position.y = g_HumanPosY;
+		g_MainCamera.position.z = g_HumanPosZ;
+		
+		g_MainCamera.translateX(c_MovingSpeed);
+		
+		g_HumanPosX=g_MainCamera.position.x;
+		g_HumanPosY=g_MainCamera.position.y;
+		g_HumanPosZ=g_MainCamera.position.z;
+	}
 }
