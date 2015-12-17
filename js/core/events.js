@@ -51,6 +51,13 @@ var OnLoaded = function()
 
 	RefreshFloor();
 	LoadLibraryCamera();
+	
+	//test
+	g_CategoriesNames[0] = "Dupa";
+	RefreshCategories();
+	//====
+	
+	SendCategoriesRequest();
 }
 
 var OnUpdate = function()

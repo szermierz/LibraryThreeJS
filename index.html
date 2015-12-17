@@ -52,6 +52,10 @@
 			var g_FloorRefreshStartPosX;
 			var g_FloorRefreshStartPosZ;
 			
+			// Setup categories variables
+			var g_CategoriesNames = [];
+			var g_CategoriesPlanes = [];
+			
 			// Setup globals
 			var g_ScreenWidth = window.innerWidth;
 			var g_ScreenHeight = window.innerHeight;
@@ -79,6 +83,7 @@
 			var g_SocketDestAddress = '//localhost:8080';
 			var g_Socket = new io.connect(g_SocketDestAddress);
 			var g_SocketConnected = false;
+			var g_Queries = [];
 			//++g_ObjectToLoad;
 			g_Socket.connect();
 			g_Socket.on('connect', OnSocketConnect);
@@ -130,6 +135,13 @@
 			g_Loader.LoadTexture('gfx/floor.png', function(texture)
 			{
 				g_FloorTexture = texture;
+				--g_ObjectToLoad;
+			});
+			var g_CategoryTexture;
+			++g_ObjectToLoad;
+			g_Loader.LoadTexture('gfx/category.png', function(texture)
+			{
+				g_CategoryTexture = texture;
 				--g_ObjectToLoad;
 			});
 			

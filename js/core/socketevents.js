@@ -14,13 +14,30 @@ var OnSocketDisconnect = function()
 	console.log("Socket disconnected!");
 }
 
-var OnSocketMessageArrived = function(data)
+var OnSocketMessageArrived = function(message)
 {
+	var queryType = g_Queries[message.sha1];
+	g_Queries.splice(message.sha1, 1);
 	
+	switch(queryType)
+	{
+	case 1:
+		LoadCategories(message.data);
+		RefreshCategories();
+		break;
+	}
 }
 
-var SendDataViaSocket = function(data)
+var SendDataViaSocket = function(message)
 {
 	if(g_SocketConnected)
-		g_Socket.send(data);
+		g_Socket.send(message);
+}
+
+var SendCategoriesRequest = function()
+{
+	var message = { name: 'categorieslist' };
+	g_Queries[sha1(message.name)] = 1;
+	
+	SendDataViaSocket(message);
 }
