@@ -64,6 +64,7 @@
 			console.log("Set up pdf document");
 			
 			// Initialize loading
+			var g_Loader = new ResourceLoader();
 			var l_LoadingBorder1 = new THREE.PlaneGeometry(310, 110);
 			var l_LoadingMaterial1 = new THREE.MeshBasicMaterial( { color: 0x999999 } );
 			var l_LoadingBox1 = new THREE.Mesh(l_LoadingBorder1, l_LoadingMaterial1);
@@ -83,13 +84,18 @@
 			console.log("Initialized display!");
 			
 			// Load resources:
-			//todo jakies tekstury
+			var l_FloorTexture;
+			++g_ObjectToLoad;
+			g_Loader.LoadTexture('gfx/floor.png', function(texture)
+			{
+				l_FloorTexture = texture;
+				--g_ObjectToLoad;
+			});
+			
 			console.log("Started loading resources!");
 			
 			//test
-			var loader = new PDFLoader();
-			
-			loader.LoadPDFTexture('test.pdf', 1, function(texture) 
+			g_Loader.LoadPDFTexture('test.pdf', 1, function(texture) 
 			{
 				var geo = new THREE.PlaneGeometry(100,100);
 				var mat = new THREE.MeshBasicMaterial( {map: texture} );

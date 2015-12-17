@@ -1,5 +1,5 @@
 
-PDFLoader = function()
+ResourceLoader = function()
 {
 	//Methods
 	this.LoadPDFTexture = function(PDFFileName, Page, Callback)
@@ -28,4 +28,12 @@ PDFLoader = function()
 			});
 		});
 	};
+	
+	this.LoadTexture = function(TextureFileName, Callback)
+	{
+		var texture;
+		//todo
+		Callback(texture);
+	}
 }
+
