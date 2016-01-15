@@ -203,9 +203,9 @@ var RefreshCamera = function()
 	g_MainCamera.rotation.y = g_HumanDirection * Math.PI / 180;
 }
 
-var ExecuteOrders = function()
+var ExecuteMovingOrders = function()
 {
-	var c_MovingSpeed = 0.05;
+		var c_MovingSpeed = 0.05;
 	var c_RotatingSpeed = 2.0;
 	
 	if(g_OrderRotateLeft)
@@ -266,5 +266,28 @@ var ExecuteOrders = function()
 		g_HumanPosY=g_MainCamera.position.y;
 		g_HumanPosZ=g_MainCamera.position.z;
 	}
+}
+
+var ExecuteFileOrders = function()
+{
+	if(g_OrderUploadFile == false)
+		return;
+	if(g_SelectedFile == null)
+		return;
+	
+	var OnLoadedEvent = function()
+	{
+		
+	}
+	
+	LoadSelectedFile(OnLoadedEvent);
+	
+	g_OrderUploadFile = false;	
+}
+
+var ExecuteOrders = function()
+{
+	ExecuteMovingOrders();
+	ExecuteFileOrders();
 }
 

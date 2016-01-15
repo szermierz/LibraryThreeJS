@@ -19,6 +19,8 @@ var OnKeyUp = function(event)
 				g_OrderMoveToLeft = false; break;
 			case 69: // E - right
 				g_OrderMoveToRight = false; break;
+			case 85: // U - upload file
+				g_OrderUploadFile = true; break;
 		}
 }
 
@@ -53,11 +55,11 @@ var OnLoaded = function()
 	LoadLibraryCamera();
 	
 	//test
-	g_CategoriesNames[0] = "Dupa";
+	g_CategoriesNames[0] = "Test";
 	RefreshCategories();
 	//====
 	
-	SendCategoriesRequest();
+	//SendCategoriesRequest();
 }
 
 var OnUpdate = function()
@@ -68,4 +70,13 @@ var OnUpdate = function()
 	ExecuteOrders();
 	
 	RefreshCamera();
+}
+
+function OnChangedSelectedFile(e) 
+{
+	var file = e.target.files[0];
+	if (!file)
+		return;
+	
+	g_SelectedFile = file;
 }

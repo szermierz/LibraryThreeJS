@@ -7,14 +7,11 @@
 		</style>
 	</head>
 	<body>
+		<input id="fileInput" type="file">
 		<canvas id="renderCanvas"></canvas>
 
 		<!-- Utils -->
 		<script src="js/utils/sha1.js"></script>
-		
-		<!-- Socket.io -->
-		<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
-		<script src="js/core/socketevents.js"></script>
 		
 		<!-- PdfJs -->
 		<script src="pdf.js"></script>
@@ -33,6 +30,9 @@
 		
 		<!-- Events -->
 		<script src="js/core/events.js"></script>
+		
+		<!-- File system -->
+		<script src="js/core/filesystem.js"></script>
 		
 		<script>
 			
@@ -69,6 +69,8 @@
 			var g_Renderer = new THREE.WebGLRenderer( { canvas: g_RenderCanvas } );
 			var g_IsLoading = true;
 			var g_ObjectToLoad = 0;
+			var g_SelectedFile = null;
+			var g_SelectedFileData = null;
 			
 			console.log("Globals loaded!");
 			
@@ -79,16 +81,11 @@
 			
 			console.log("Set up main document");
 					
-			// Setup Socket.io
-			var g_SocketDestAddress = '//localhost:8080';
-			var g_Socket = new io.connect(g_SocketDestAddress);
-			var g_SocketConnected = false;
+			// Setup XHTTP
+			var g_Hhttp = new XMLHttpRequest();
+			//g_Hhttp.open("GET", "http://127.0.0.1:1337/test", false);
+			//g_Hhttp.send("{\"testowystring\": \"testowedane\"}");
 			var g_Queries = [];
-			//++g_ObjectToLoad;
-			g_Socket.connect();
-			g_Socket.on('connect', OnSocketConnect);
-			g_Socket.on('message', OnSocketMessageArrived);
-			g_Socket.on('disconnect', OnSocketDisconnect);
 			
 			console.log("Set up Socket.io");
 			
@@ -99,8 +96,10 @@
 			var g_OrderMoveBackward = false;
 			var g_OrderMoveToLeft   = false;
 			var g_OrderMoveToRight  = false;
+			var g_OrderUploadFile   = false;
 			document.addEventListener('keyup', OnKeyUp, false);
 			document.addEventListener('keydown', OnKeyDown, false);
+			document.getElementById('fileInput').addEventListener('change', OnChangedSelectedFile, false);
 			
 			console.log("Set up event listeners");
 			
