@@ -1,5 +1,5 @@
 
-var LoadSelectedFile = function(OnEndListener)
+var LoadSelectedFile = function(OnEndCallback)
 {
 	if(g_SelectedFile == null)
 		return;
@@ -9,7 +9,7 @@ var LoadSelectedFile = function(OnEndListener)
 	{
 		g_SelectedFileData = reader.result;
 		
-		OnEndListener();
+		OnEndCallback();
 		
 		console.log("Successfuly loaded file");
 	};

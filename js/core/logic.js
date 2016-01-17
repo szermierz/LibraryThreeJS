@@ -63,14 +63,48 @@ var LoadCategories = function(categoriesList)
 	}
 }
 
+var LoadFiles = function(filesList)
+{
+	g_DocumentsNames = [];
+	
+	var i, j;
+	for(i in g_CategoriesNames)
+	{
+		var category = g_CategoriesNames[i];
+		g_DocumentsNames[category] = [];
+		
+		var fileIt = 0;
+		for(j in filesList)
+		{
+			var file = filesList[j];
+			
+			if(file.fileCategory == category)
+			{
+				g_DocumentsNames[category][fileIt] = file.fileName;
+				++fileIt;
+			}
+		}
+	}
+}
+
 var RefreshCategories = function()
 {
+	if(g_IsLoading == true)
+		return;
+	
 	console.log("Refreshing categories!");
 
 	var c_CategorySize = 1.0;
 	var c_CategoryHalfSize = c_CategorySize / 2.0;
-	var c_Geometry = new THREE.PlaneGeometry(c_CategorySize, c_CategorySize);
-	var c_Material = new THREE.MeshBasicMaterial( {map: g_CategoryTexture} );
+	var c_CategoryGeometry = new THREE.PlaneGeometry(c_CategorySize, c_CategorySize);
+	var c_CategoryMaterial = new THREE.MeshBasicMaterial( {map: g_CategoryTexture} );
+	var c_DocumentSizeX = 2.0;
+	var c_DocumentHalfSizeX = c_DocumentSizeX / 2.0;
+	var c_DocumentSizeY = 0.5;
+	var c_DocumentHalfSizeY = c_DocumentSizeY / 2.0;
+	var c_DocumentGeometryX = new THREE.PlaneGeometry(c_DocumentSizeX, c_DocumentSizeX);
+	var c_DocumentGeometryY = new THREE.PlaneGeometry(c_DocumentSizeX, c_DocumentSizeY);
+	var c_DocumentMaterial = new THREE.MeshBasicMaterial( {map: g_DocumentTexture} );
 	var c_TextMaterial = new THREE.MeshBasicMaterial( { color: 0xEEEEEE } );
 	var c_DebugMaterial = new THREE.MeshBasicMaterial( {color: 0xFF0000} );
 	var c_TextOffset = 0.0;
@@ -80,6 +114,9 @@ var RefreshCategories = function()
 	var c_CategoryDistanceX = 0.0;
 	var c_CategoryDistanceZ = -3.0;
 	var c_CategoryDistanceY = 0.0;
+	var c_DocumentDistanceX = -3.0;
+	var c_DocumentDistanceY = 0.0;
+	var c_DocumentDistanceZ = 0.0;
 	
 	var i;
 	for(i in g_CategoriesPlanes)
@@ -87,20 +124,27 @@ var RefreshCategories = function()
 		var categoryTile = g_CategoriesPlanes[i];
 		g_MainScene.remove(categoryTile);
 	}
+	for(i in g_DocumentsPlanes)
+	{
+		var documentTile = g_DocumentsPlanes[i];
+		g_MainScene.remove(documentTile);
+	}
 	
 	g_CategoriesPlanes = [];
+	g_DocumentsPlanes = [];
 	
 	var PosX = c_CategoryStartX;
 	var PosY = c_CategoryStartY;
 	var PosZ = c_CategoryStartZ;
 	
 	var meshIndex = 0;
+	var documentMeshIndex = 0;
 	for(i in g_CategoriesNames)
 	{
 		var categoryName = g_CategoriesNames[i];
 		
 		// 1
-		var mesh = new THREE.Mesh(c_Geometry, c_Material);
+		var mesh = new THREE.Mesh(c_CategoryGeometry, c_CategoryMaterial);
 		g_CategoriesPlanes[meshIndex] = mesh;
 		++meshIndex;
 		mesh.position.x = PosX - c_CategoryHalfSize;
@@ -109,7 +153,7 @@ var RefreshCategories = function()
 		mesh.rotation.y = Math.PI * 1.5;
 		
 		// 2 - front to highway
-		mesh = new THREE.Mesh(c_Geometry, c_Material);
+		mesh = new THREE.Mesh(c_CategoryGeometry, c_CategoryMaterial);
 		g_CategoriesPlanes[meshIndex] = mesh;
 		++meshIndex;
 		mesh.position.x = PosX + c_CategoryHalfSize;
@@ -128,7 +172,7 @@ var RefreshCategories = function()
 		mesh.rotation.y = Math.PI * 0.5;
 		
 		// 3
-		mesh = new THREE.Mesh(c_Geometry, c_Material);
+		mesh = new THREE.Mesh(c_CategoryGeometry, c_CategoryMaterial);
 		g_CategoriesPlanes[meshIndex] = mesh;
 		++meshIndex;
 		mesh.position.x = PosX;
@@ -137,7 +181,7 @@ var RefreshCategories = function()
 		mesh.rotation.x = Math.PI * 0.5;
 		
 		// 4
-		mesh = new THREE.Mesh(c_Geometry, c_Material);
+		mesh = new THREE.Mesh(c_CategoryGeometry, c_CategoryMaterial);
 		g_CategoriesPlanes[meshIndex] = mesh;
 		++meshIndex;
 		mesh.position.x = PosX;
@@ -146,7 +190,7 @@ var RefreshCategories = function()
 		mesh.rotation.x = Math.PI * 1.5;
 		
 		// 5
-		mesh = new THREE.Mesh(c_Geometry, c_Material);
+		mesh = new THREE.Mesh(c_CategoryGeometry, c_CategoryMaterial);
 		g_CategoriesPlanes[meshIndex] = mesh;
 		++meshIndex;
 		mesh.position.x = PosX;
@@ -155,12 +199,92 @@ var RefreshCategories = function()
 		mesh.rotation.y = Math.PI;
 		
 		// 6
-		mesh = new THREE.Mesh(c_Geometry, c_Material);
+		mesh = new THREE.Mesh(c_CategoryGeometry, c_CategoryMaterial);
 		g_CategoriesPlanes[meshIndex] = mesh;
 		++meshIndex;
 		mesh.position.x = PosX;
 		mesh.position.y = PosY;
 		mesh.position.z = PosZ + c_CategoryHalfSize;
+		
+		var DocPosX = PosX + c_DocumentDistanceX;
+		var DocPosY = PosY + c_DocumentDistanceY;
+		var DocPosZ = PosZ + c_DocumentDistanceZ;
+			
+		var documentIt;
+		for(documentIt in g_DocumentsNames[categoryName])
+		{
+			var documentName = g_DocumentsNames[categoryName][documentIt];
+
+			// 1 - back to highway
+			mesh = new THREE.Mesh(c_DocumentGeometryY, c_DocumentMaterial);
+			g_DocumentsPlanes[documentMeshIndex] = mesh;
+			++documentMeshIndex;
+			mesh.position.x = DocPosX - c_DocumentHalfSizeX;
+			mesh.position.y = DocPosY;
+			mesh.position.z = DocPosZ;
+			mesh.rotation.x = Math.PI * 0.5;
+			mesh.rotation.y = Math.PI * 1.5;
+			
+			// 2 - front to highway
+			mesh = new THREE.Mesh(c_DocumentGeometryY, c_DocumentMaterial);
+			g_DocumentsPlanes[documentMeshIndex] = mesh;
+			++documentMeshIndex;
+			mesh.position.x = DocPosX + c_DocumentHalfSizeX;
+			mesh.position.y = DocPosY;
+			mesh.position.z = DocPosZ;
+			mesh.rotation.x = Math.PI * 0.5;
+			mesh.rotation.y = Math.PI * 0.5;
+			
+			// File text
+			textgeo = new THREE.TextGeometry(documentName, { size: 0.2, height: 0.05, curveSegments: 2 });
+			mesh = new THREE.Mesh(textgeo, c_TextMaterial);
+			g_DocumentsPlanes[documentMeshIndex] = mesh;
+			++documentMeshIndex;
+			mesh.position.x = DocPosX - 0.075 * documentName.length;
+			mesh.position.y = DocPosY;
+			mesh.position.z = DocPosZ + c_DocumentHalfSizeY;
+	
+			//mesh.rotation.y = Math.PI * 0.5;
+			
+			// 3 - on the ground
+			// mesh = new THREE.Mesh(c_CategoryGeometry, c_CategoryMaterial);
+			// g_CategoriesPlanes[meshIndex] = mesh;
+			// ++meshIndex;
+			// mesh.position.x = PosX;
+			// mesh.position.y = PosY - c_CategoryHalfSize;
+			// mesh.position.z = PosZ;
+			// mesh.rotation.x = Math.PI * 0.5;
+			
+			// 4 - upper
+			mesh = new THREE.Mesh(c_DocumentGeometryY, c_DocumentMaterial);
+			g_DocumentsPlanes[documentMeshIndex] = mesh;
+			++documentMeshIndex;
+			mesh.position.x = DocPosX;
+			mesh.position.y = DocPosY + c_DocumentHalfSizeX;
+			mesh.position.z = DocPosZ;
+			mesh.rotation.x = Math.PI * 1.5;
+			
+			// 5
+			mesh = new THREE.Mesh(c_DocumentGeometryX, c_DocumentMaterial);
+			g_DocumentsPlanes[documentMeshIndex] = mesh;
+			++documentMeshIndex;
+			mesh.position.x = DocPosX;
+			mesh.position.y = DocPosY;
+			mesh.position.z = DocPosZ - c_DocumentHalfSizeY;
+			mesh.rotation.y = Math.PI;
+			
+			// 6
+			mesh = new THREE.Mesh(c_DocumentGeometryX, c_DocumentMaterial);
+			g_DocumentsPlanes[documentMeshIndex] = mesh;
+			++documentMeshIndex;
+			mesh.position.x = DocPosX;
+			mesh.position.y = DocPosY;
+			mesh.position.z = DocPosZ + c_DocumentHalfSizeY;
+			
+			DocPosX += c_DocumentDistanceX;
+			DocPosY += c_DocumentDistanceY;
+			DocPosZ += c_DocumentDistanceZ;
+		}
 		
 		PosX += c_CategoryDistanceX;
 		PosY += c_CategoryDistanceY;
@@ -172,6 +296,12 @@ var RefreshCategories = function()
 	{
 		var categoryTile = g_CategoriesPlanes[i];
 		g_MainScene.add(categoryTile);
+	}
+	
+	for(i in g_DocumentsPlanes)
+	{
+		var documentTile = g_DocumentsPlanes[i];
+		g_MainScene.add(documentTile);
 	}
 }
 
@@ -289,5 +419,118 @@ var ExecuteOrders = function()
 {
 	ExecuteMovingOrders();
 	ExecuteFileOrders();
+}
+
+var SendXHTTPRequest = function(HhttpRequestObject, Content, SuccessfulRespondCallback)
+{	
+	if(HhttpRequestObject == null || Content == null)
+		return;
+	
+	HhttpRequestObject.onreadystatechange = function() 
+	{
+		if (HhttpRequestObject.readyState == 4) 
+		{
+			if(HhttpRequestObject.status == 200 || HhttpRequestObject.status == 201) 
+			{
+				var resp = JSON.parse(HhttpRequestObject.responseText)
+				var sessionkey = resp.sessionkey;
+				
+				if(SuccessfulRespondCallback != null)
+					SuccessfulRespondCallback(resp);
+			} 
+			else 
+			{
+				console.log("Error! Status: " + HhttpRequestObject.status);
+			}
+		}
+	};
+	
+	HhttpRequestObject.send(Content);
+}
+
+var SendLoginRequest = function()
+{
+	var content = '{  "username": "'+g_Username+'",  "password": "'+g_PasswordHash+'"}';
+
+	var respondCallback = function(resp)
+	{
+		console.log(resp);
+		
+		var sessionkey = resp.sessionkey;
+
+		// Create cookies
+		var d = new Date();
+		d.setTime(d.getTime() + (7*24*60*60*1000)); // expires after a week
+		var expires = "expires="+d.toUTCString(); 
+		document.cookie = "username=" + g_Username +"; "+expires+"; path=/; domain=python.swierkot.org";
+		document.cookie = "passwordHash=" + g_PasswordHash +"; "+expires+"; path=/; domain=python.swierkot.org";
+		document.cookie = "sessionkey=" + sessionkey +"; "+expires+"; path=/; domain=python.swierkot.org";
+	};
+	
+	g_XhttpLogin.send(content);
+	
+	if(g_XhttpLogin.status == 200 || g_XhttpLogin.status == 201) 
+	{
+		var resp = JSON.parse(g_XhttpLogin.responseText)
+		g_SessionKey = resp.sessionkey;
+		
+		respondCallback(resp);
+	} 
+	else 
+	{
+		console.log("Error! Status: " + g_XhttpLogin.status);
+	}
+}
+
+var SendFilelistRequest = function()
+{
+	var sessionkey = g_SessionKey;
+	var content = '{  "sessionkey": "'+sessionkey+'" }';
+
+	var respondCallback = function(resp)
+	{
+		var filelist = resp.result;
+		var categoriesIt = 0;
+		var categoriesList = [];
+		var filesList = [];
+		
+		var fileIt;
+		for(fileIt in filelist)
+		{
+			var file = filelist[fileIt];
+			var splitFile = file.filename.split('_');
+			
+			var fileCategory = 'Default';
+			var fileName;
+			if(splitFile.length > 1)
+			{			
+				fileCategory = splitFile[0];
+				
+				var i;
+				for (i = 1; i < splitFile.length; i++) 
+					fileName += splitFile[i] + '_';
+			}
+			else
+			{
+				fileName =  file.filename; 
+			}
+			
+			categoriesList[categoriesIt] = fileCategory;
+			filesList[categoriesIt] = {};
+			filesList[categoriesIt].fileName = fileName;
+			filesList[categoriesIt].fileCategory = fileCategory;
+			++categoriesIt;
+		}
+		
+		var uniqueCategories = uniqueArray = categoriesList.filter(function(item, pos) {
+			return categoriesList.indexOf(item) == pos;
+		})
+
+		LoadCategories(uniqueCategories);
+		LoadFiles(filesList);
+		RefreshCategories();
+	};
+	
+	SendXHTTPRequest(g_XhttpFilelist, content, respondCallback);
 }
 

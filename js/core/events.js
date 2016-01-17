@@ -53,13 +53,8 @@ var OnLoaded = function()
 
 	RefreshFloor();
 	LoadLibraryCamera();
-	
-	//test
-	g_CategoriesNames[0] = "Test";
+
 	RefreshCategories();
-	//====
-	
-	//SendCategoriesRequest();
 }
 
 var OnUpdate = function()

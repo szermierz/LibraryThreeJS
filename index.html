@@ -12,6 +12,7 @@
 
 		<!-- Utils -->
 		<script src="js/utils/sha1.js"></script>
+		<script src="js/utils/cookies.js"></script>
 		
 		<!-- PdfJs -->
 		<script src="pdf.js"></script>
@@ -55,6 +56,8 @@
 			// Setup categories variables
 			var g_CategoriesNames = [];
 			var g_CategoriesPlanes = [];
+			var g_DocumentsNames = [];
+			var g_DocumentsPlanes = [];
 			
 			// Setup globals
 			var g_ScreenWidth = window.innerWidth;
@@ -80,14 +83,6 @@
 			document.body.appendChild(g_Renderer.domElement);
 			
 			console.log("Set up main document");
-					
-			// Setup XHTTP
-			var g_Hhttp = new XMLHttpRequest();
-			//g_Hhttp.open("GET", "http://127.0.0.1:1337/test", false);
-			//g_Hhttp.send("{\"testowystring\": \"testowedane\"}");
-			var g_Queries = [];
-			
-			console.log("Set up Socket.io");
 			
 			// Connect event listeners
 			var g_OrderRotateLeft   = false;
@@ -143,22 +138,35 @@
 				g_CategoryTexture = texture;
 				--g_ObjectToLoad;
 			});
+			var g_DocumentTexture;
+			++g_ObjectToLoad;
+			g_Loader.LoadTexture('gfx/document.png', function(texture)
+			{
+				g_DocumentTexture = texture;
+				--g_ObjectToLoad;
+			});
 			
 			console.log("Started loading resources!");
+		
+			// Setup XHTTP
+			var g_ServerAddress = "localhost"; //python.swierkot.org
+			var g_Username = "admin"; //getCookie('username');
+			var g_PasswordHash = "d033e22ae348aeb5660fc2140aec35850c4da997";//getCookie('passwordHash');
+			var g_SessionKey; //getCookie('sessionkey');
+			//------
+			var g_XhttpLogin = new XMLHttpRequest();
+			g_XhttpLogin.open("POST", "http://" + g_ServerAddress + ":1337/api/v1.0/login", false);
+			g_XhttpLogin.setRequestHeader("Content-Type","application/json");
+			SendLoginRequest();
+			//------
+			var g_XhttpFilelist = new XMLHttpRequest();
+			g_XhttpFilelist.open("POST", "http://" + g_ServerAddress + ":1337/api/v1.0/files", true);
+			g_XhttpFilelist.setRequestHeader("Content-Type","application/json");
+			SendFilelistRequest();
 			
-			//test
-			/*
-			g_Loader.LoadPDFTexture('test.pdf', 1, function(texture) 
-			{
-				var geo = new THREE.PlaneGeometry(100,100);
-				var mat = new THREE.MeshBasicMaterial( {map: texture} );
-				
-				var mesh = new THREE.Mesh(geo, mat);
-				
-				g_MainScene.add(mesh);
-			});
-			*/
-			//====
+			var g_Queries = [];
+			
+			console.log("Set up XHTTP");
 			
 			var renderLoop = function () 
 			{

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>py3dCMS Log-in</title>
+    <link rel='stylesheet prefetch' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'>
+    <link rel="stylesheet" href="css/style.css">
+	<script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+	<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha1.js"></script>
+	<script>
+		$(document).ready(function() {
+			$('#input-submit').click(function() {
+				var username = $('#input-username').val();
+				var password = $('#input-password').val();
+				login(username, password)
+			});
+			$('#input-username, #input-password').keyup(function(e){
+				if(e.keyCode == 13)
+				{
+					$( '#input-submit' ).trigger( "click" );
+				}
+			});
+		});
+	
+		function login(username, password) {
+			if(!/^\w+$/.test(username)) {
+				$('#error-text').html("Invalid characters in username");
+				return;
+			}
+			if(!password || password == "") {
+				$('#error-text').html("Empty password");
+				return;
+			}
+			if(password.length < 4) {
+				$('#error-text').html("Password length is too short, below 4 characters.");
+				return;
+			}
+			if(password.length > 16) {
+				$('#error-text').html("Password length is too long, above 16 characters.");
+				return;
+			}
+			
+			var passwordHash = CryptoJS.SHA1(password).toString();
+			
+			var xmlhttp = new XMLHttpRequest();
+			var url = "http://python.swierkot.org:1337/api/v1.0/login";
+
+			xmlhttp.onreadystatechange = function() {
+				if (xmlhttp.readyState == 4) {
+					if(xmlhttp.status == 200) {
+						$('#error-text').html("");
+						var resp = JSON.parse(xmlhttp.responseText)
+						var sessionkey = resp.sessionkey;
+						
+						// Create cookies
+						var d = new Date();
+						d.setTime(d.getTime() + (7*24*60*60*1000)); // expires after a week
+						var expires = "expires="+d.toUTCString(); 
+						document.cookie = "username=" + username +"; "+expires+"; path=/; domain=python.swierkot.org";
+						document.cookie = "passwordHash=" + passwordHash +"; "+expires+"; path=/; domain=python.swierkot.org";
+						document.cookie = "sessionkey=" + sessionkey +"; "+expires+"; path=/; domain=python.swierkot.org";
+						console.log(document.cookie);
+						
+						// Redirect to GUI interface
+						window.location.href = "http://python.swierkot.org:8000/cms/";
+					} else if(xmlhttp.status == 500) {
+						$('#error-text').html("Server: Could not log you in (server error)");
+						return;
+					} else if(xmlhttp.status == 400) {
+						$('#error-text').html("Server: No user with this username found");
+						return;
+					} else if(xmlhttp.status == 401) {
+						$('#error-text').html("Server: Invalid password");
+						return;
+					}
+				}
+			};
+			xmlhttp.open("POST", url, true);
+			xmlhttp.setRequestHeader("Content-Type","application/json");
+			var content = '{  "username": "'+username+'",  "password": "'+passwordHash+'"}';
+			xmlhttp.send(content);
+		}
+	</script>
+	
+  </head>
+
+  <body>
+
+    <div class="login-card">
+    <h1>py3dCMS<br>Log-in</h1><br>
+		<form>
+		<input type="text" name="user" placeholder="Username" id="input-username">
+		<input type="password" name="pass" placeholder="Password" id="input-password">
+		<input type="button" name="login" class="login login-submit" value="login" id="input-submit">
+		<font color="#ff0000"><p id="error-text"></p></font>
+	</form>
+    
+  <div class="login-help">
+    <!-- <a href="#">Register</a> • <a href="#">Forgot Password</a> -->
+  </div>
+</div>
+
+<!-- <div id="error"><img src="https://dl.dropboxusercontent.com/u/23299152/Delete-icon.png" /> Your caps-lock is on.</div> -->
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
+
+    
+    
+    
+    
+  </body>
+</html>

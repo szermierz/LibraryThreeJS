@@ -1,6 +1,21 @@
 
 ResourceLoader = function()
 {
+	
+	//test
+	/*
+	g_Loader.LoadPDFTexture('test.pdf', 1, function(texture) 
+	{
+		var geo = new THREE.PlaneGeometry(100,100);
+		var mat = new THREE.MeshBasicMaterial( {map: texture} );
+		
+		var mesh = new THREE.Mesh(geo, mat);
+		
+		g_MainScene.add(mesh);
+	});
+	*/
+	//====
+	
 	//Methods
 	this.LoadPDFTexture = function(PDFFileName, Page, Callback)
 	{
